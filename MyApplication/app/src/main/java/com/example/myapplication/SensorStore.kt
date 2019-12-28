@@ -17,12 +17,18 @@ import org.w3c.dom.Text
 import java.util.*
 
 public class SensorStore : SensorEventListener {
-    private lateinit var mSensorManager: SensorManager
-    private lateinit var con: Context
-    private lateinit var xReadingText: TextView
-    private lateinit var yReadingText: TextView
-    private lateinit var zReadingText: TextView
+    private var mSensorManager: SensorManager
+    private var con: Context
+    private var xReadingText: TextView
+    private var yReadingText: TextView
+    private var zReadingText: TextView
+    private var xSlope: Float = 0.0F
+    private var ySlope: Float = 0.0F
+    private var zSlope: Float = 0.0F
     private var acc: Int = 0
+    private lateinit var xList: MutableList<Float>
+    private lateinit var yList: MutableList<Float>
+    private lateinit var zList: MutableList<Float>
 
     constructor(context: Context, xRead: TextView, yRead: TextView, zRead: TextView){
         mSensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -39,24 +45,52 @@ public class SensorStore : SensorEventListener {
 
     fun wristFlickDetected() {
         //Toast.makeText(con, "Starting", Toast.LENGTH_SHORT).show()
+        initializeLists()
         var linearSensor : Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         mSensorManager.registerListener(this, linearSensor, SensorManager.SENSOR_DELAY_GAME)
         Log.v("Status", "Registered Sensor and is actively listening")
         startTimerToUnRegister()
     }
 
+    private fun initializeLists(){
+        xList = mutableListOf()
+        yList = mutableListOf()
+        zList = mutableListOf()
+    }
+
     private fun startTimerToUnRegister(){
         Handler().postDelayed({
             Log.v("Status", "Calling Destroy")
+            calculationHelper()
             destroy()
         }, 1000)
     }
+
+    private fun calculationHelper(){
+        xSlope = 0.0F
+        ySlope = 0.0F
+        zSlope = 0.0F
+
+        for(i in 0 until xList.size){
+            xSlope += xList[i]
+            ySlope += yList[i]
+            zSlope += zList[i]
+        }
+
+        xSlope /= xList.size
+        ySlope /= yList.size
+        zSlope /= zList.size
+    }
+
     override fun onSensorChanged(p0: SensorEvent?) {
         if (p0 != null) {
             if (p0.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION && acc == 1)
                 xReadingText.text = "X-Reading" + p0.values[0].toString().substring(0,3)
                 yReadingText.text = "Y-Reading" + p0.values[1].toString().substring(0,3)
                 zReadingText.text = "Z-Reading" + p0.values[2].toString().substring(0,3)
+                xList.add(p0.values[0])
+                yList.add(p0.values[1])
+                zList.add(p0.values[2])
         }
     }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -86,8 +120,8 @@ public class SensorStore : SensorEventListener {
 //        unregister the sensor onPause else it will be active even if the activity is closed
         Log.v("Status", "Destroyed all listeners to sensor")
         mSensorManager.unregisterListener(this)
-        xReadingText.text = "Finished"
-        yReadingText.text = "Finished"
-        zReadingText.text = "Finished"
+        xReadingText.text = xSlope.toString()
+        yReadingText.text = ySlope.toString()
+        zReadingText.text = zSlope.toString()
     }
 }
