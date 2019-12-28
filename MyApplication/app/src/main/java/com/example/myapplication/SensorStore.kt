@@ -42,21 +42,21 @@ public class SensorStore : SensorEventListener {
         var linearSensor : Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         mSensorManager.registerListener(this, linearSensor, SensorManager.SENSOR_DELAY_GAME)
         Log.v("Status", "Registered Sensor and is actively listening")
-        //startTimerToUnRegister()
+        startTimerToUnRegister()
     }
 
     private fun startTimerToUnRegister(){
         Handler().postDelayed({
             Log.v("Status", "Calling Destroy")
             destroy()
-        }, 5000)
+        }, 1000)
     }
     override fun onSensorChanged(p0: SensorEvent?) {
         if (p0 != null) {
             if (p0.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION && acc == 1)
-                xReadingText.text = "X-Reading" + p0.values[0].toString().substring(0,5)
-                yReadingText.text = "Y-Reading" + p0.values[1].toString().substring(0,5)
-                zReadingText.text = "Z-Reading" + p0.values[2].toString().substring(0,5)
+                xReadingText.text = "X-Reading" + p0.values[0].toString().substring(0,3)
+                yReadingText.text = "Y-Reading" + p0.values[1].toString().substring(0,3)
+                zReadingText.text = "Z-Reading" + p0.values[2].toString().substring(0,3)
         }
     }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -86,5 +86,8 @@ public class SensorStore : SensorEventListener {
 //        unregister the sensor onPause else it will be active even if the activity is closed
         Log.v("Status", "Destroyed all listeners to sensor")
         mSensorManager.unregisterListener(this)
+        xReadingText.text = "Finished"
+        yReadingText.text = "Finished"
+        zReadingText.text = "Finished"
     }
 }
