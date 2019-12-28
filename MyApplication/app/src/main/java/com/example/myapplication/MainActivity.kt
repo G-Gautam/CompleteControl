@@ -20,13 +20,8 @@ class MainActivity : WearableActivity() {
         xReadingText = findViewById(R.id.xReadingText)
         yReadingText = findViewById(R.id.yReadingText)
         zReadingText = findViewById(R.id.zReadingText)
-        val startButton = findViewById(R.id.startButton) as Button
-
         sensorStore = SensorStore(this, xReadingText, yReadingText, zReadingText)
 
-        startButton.setOnClickListener {
-            Log.v("Status", "Button click is working")
-        }
         setAmbientEnabled()
     }
 
@@ -37,14 +32,12 @@ class MainActivity : WearableActivity() {
                 // Flick wrist out
                 triggerFlick()
             else -> {
-                Log.v("Status", "Flick not detected")
                 super.onKeyDown(keyCode, event)
             }
         }
     }
 
     private fun triggerFlick() : Boolean{
-        Log.v("Status", "Flick detected")
         sensorStore.wristFlickDetected()
         return false
     }
