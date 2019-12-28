@@ -48,7 +48,6 @@ public class SensorStore : SensorEventListener {
         initializeLists()
         var linearSensor : Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         mSensorManager.registerListener(this, linearSensor, SensorManager.SENSOR_DELAY_GAME)
-        Log.v("Status", "Registered Sensor and is actively listening")
         startTimerToUnRegister()
     }
 
@@ -60,7 +59,6 @@ public class SensorStore : SensorEventListener {
 
     private fun startTimerToUnRegister(){
         Handler().postDelayed({
-            Log.v("Status", "Calling Destroy")
             calculationHelper()
             destroy()
         }, 1000)
@@ -87,7 +85,6 @@ public class SensorStore : SensorEventListener {
         yMean /= yList.size
         zMean /= zList.size
 
-        Log.v("Value", xMean.toString())
         for(i in 0 until xList.size){
             xSlope += ((xList[i]-xMean)*(1000/xList.size*i-timeSlope))/((1000/xList.size*i-timeSlope)*(1000/xList.size*i-timeSlope))
             ySlope += ((yList[i]-yMean)*(1000/yList.size*i-timeSlope))/((1000/yList.size*i-timeSlope)*(1000/yList.size*i-timeSlope))
@@ -131,7 +128,6 @@ public class SensorStore : SensorEventListener {
 
     fun destroy() {
 //        unregister the sensor onPause else it will be active even if the activity is closed
-        Log.v("Status", "Destroyed all listeners to sensor")
         mSensorManager.unregisterListener(this)
         xReadingText.text = xSlope.toString()
         yReadingText.text = ySlope.toString()
