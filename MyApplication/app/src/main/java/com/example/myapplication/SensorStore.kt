@@ -13,6 +13,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
+import org.w3c.dom.Text
 import java.util.*
 
 public class SensorStore : SensorEventListener {
@@ -21,15 +22,19 @@ public class SensorStore : SensorEventListener {
     private lateinit var xReadingText: TextView
     private lateinit var yReadingText: TextView
     private lateinit var zReadingText: TextView
+    private var acc: Int = 0
 
-    constructor(context: Context){
+    constructor(context: Context, xRead: TextView, yRead: TextView, zRead: TextView){
         mSensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         con = context
-        val deviceSensors: List<Sensor> = mSensorManager.getSensorList(Sensor.TYPE_ALL)
-        Log.v("Total sensors",""+deviceSensors.size)
-        deviceSensors.forEach{
-            Log.v("Sensor name",""+it)
-        }
+        xReadingText = xRead
+        yReadingText = yRead
+        zReadingText = zRead
+//        val deviceSensors: List<Sensor> = mSensorManager.getSensorList(Sensor.TYPE_ALL)
+//        Log.v("Total sensors",""+deviceSensors.size)
+//        deviceSensors.forEach{
+//            Log.v("Sensor name",""+it)
+//        }
     }
 
     fun wristFlickDetected() {
@@ -37,7 +42,7 @@ public class SensorStore : SensorEventListener {
         var linearSensor : Sensor? = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         mSensorManager.registerListener(this, linearSensor, SensorManager.SENSOR_DELAY_GAME)
         Log.v("Status", "Registered Sensor and is actively listening")
-        startTimerToUnRegister()
+        //startTimerToUnRegister()
     }
 
     private fun startTimerToUnRegister(){
@@ -48,14 +53,33 @@ public class SensorStore : SensorEventListener {
     }
     override fun onSensorChanged(p0: SensorEvent?) {
         if (p0 != null) {
-            if (p0.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION)
+            if (p0.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION && acc == 1)
                 xReadingText.text = "X-Reading" + p0.values[0].toString().substring(0,5)
                 yReadingText.text = "Y-Reading" + p0.values[1].toString().substring(0,5)
                 zReadingText.text = "Z-Reading" + p0.values[2].toString().substring(0,5)
         }
     }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (sensor != null) {
+            when (accuracy) {
+                0 -> {
+                    Log.v("Accuracy", "Low")
+                    acc = 0
+                }
+                1 -> {
+                    Log.v("Accuracy", "Med")
+                    acc = 1
+                }
+                2 -> {
+                    Log.v("Accuracy", "High")
+                    acc = 1
+                }
+                3 -> {
+                    Log.v("Accuracy", "Perfect")
+                    acc = 1
+                }
+            }
+        }
     }
 
     fun destroy() {

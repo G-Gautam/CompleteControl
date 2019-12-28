@@ -22,7 +22,7 @@ class MainActivity : WearableActivity() {
         zReadingText = findViewById(R.id.zReadingText)
         val startButton = findViewById(R.id.startButton) as Button
 
-        sensorStore = SensorStore(this)
+        sensorStore = SensorStore(this, xReadingText, yReadingText, zReadingText)
 
         startButton.setOnClickListener {
             Log.v("Status", "Button click is working")
