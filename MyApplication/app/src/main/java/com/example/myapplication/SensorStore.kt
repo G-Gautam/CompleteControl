@@ -67,19 +67,32 @@ public class SensorStore : SensorEventListener {
     }
 
     private fun calculationHelper(){
+        //find trend line by using least square method
+        val timeSlope = 501
+        var xMean = 0.0F
+        var yMean = 0.0F
+        var zMean = 0.0F
+
         xSlope = 0.0F
         ySlope = 0.0F
         zSlope = 0.0F
 
         for(i in 0 until xList.size){
-            xSlope += xList[i]
-            ySlope += yList[i]
-            zSlope += zList[i]
+            xMean += xList[i]
+            yMean += yList[i]
+            zMean += zList[i]
         }
 
-        xSlope /= xList.size
-        ySlope /= yList.size
-        zSlope /= zList.size
+        xMean /= xList.size
+        yMean /= yList.size
+        zMean /= zList.size
+
+        Log.v("Value", xMean.toString())
+        for(i in 0 until xList.size){
+            xSlope += ((xList[i]-xMean)*(1000/xList.size*i-timeSlope))/((1000/xList.size*i-timeSlope)*(1000/xList.size*i-timeSlope))
+            ySlope += ((yList[i]-yMean)*(1000/yList.size*i-timeSlope))/((1000/yList.size*i-timeSlope)*(1000/yList.size*i-timeSlope))
+            zSlope += ((zList[i]-zMean)*(1000/zList.size*i-timeSlope))/((1000/zList.size*i-timeSlope)*(1000/zList.size*i-timeSlope))
+        }
     }
 
     override fun onSensorChanged(p0: SensorEvent?) {
