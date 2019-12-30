@@ -1,19 +1,8 @@
 package com.example.myapplication
 
-class Payload(private var xTrend: Float, private var yTrend: Float, private var zTrend: Float) {
+import java.time.LocalDateTime
 
-    fun XTrend() : Float{
-        return this.xTrend
-    }
-
-    fun YTrend() : Float{
-        return this.yTrend
-    }
-
-    fun ZTrend() : Float{
-        return this.zTrend
-    }
-
+class Payload(var xTrend: Float, var yTrend: Float, var zTrend: Float) {
     fun hasValues() : Boolean{
         if(xTrend != null && yTrend != null && zTrend != null){
             return true
