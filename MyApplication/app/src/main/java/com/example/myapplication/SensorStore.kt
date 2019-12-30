@@ -129,8 +129,23 @@ public class SensorStore : SensorEventListener {
     fun destroy() {
 //        unregister the sensor onPause else it will be active even if the activity is closed
         mSensorManager.unregisterListener(this)
-        xReadingText.text = xSlope.toString()
-        yReadingText.text = ySlope.toString()
-        zReadingText.text = zSlope.toString()
+
+        var payload = Payload(xSlope, ySlope, zSlope)
+        var result = addToFirebase(payload)
+        if(result){
+            xReadingText.text = xSlope.toString()
+            yReadingText.text = ySlope.toString()
+            zReadingText.text = zSlope.toString()
+        }
+        else{
+            xReadingText.text = "Error"
+            yReadingText.text = "Error"
+            zReadingText.text = "Error"
+        }
+    }
+
+    private fun addToFirebase(payload: Payload) : Boolean{
+        val sensorBridge = SensorBridge()
+        return sensorBridge.add(payload)
     }
 }
