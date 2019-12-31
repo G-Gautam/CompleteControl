@@ -41,9 +41,4 @@ class MainActivity : WearableActivity() {
         sensorStore.wristFlickDetected()
         return false
     }
-
-    override fun onPause(){
-        super.onPause()
-        sensorStore.destroy()
-    }
 }
