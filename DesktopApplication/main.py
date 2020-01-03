@@ -2,6 +2,7 @@ from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+import ServiceHelper
 
 
 class LoginScreen(GridLayout):
@@ -24,4 +25,4 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    MyApp().run()
+    ServiceHelper.launchFile(1)
