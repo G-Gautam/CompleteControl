@@ -1,4 +1,5 @@
 package com.example.myapplication
+import android.content.Intent
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.util.Log
@@ -6,6 +7,8 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.widget.Button
 import android.widget.TextView
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 class MainActivity : WearableActivity() {
 
@@ -48,4 +51,28 @@ class MainActivity : WearableActivity() {
         sensorStore.wristFlickDetected()
         return false
     }
+
+    private fun signIn() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)
+                firebaseAuthWithGoogle(account!!)
+            } catch (e: ApiException) {
+                // Google Sign In failed, update UI appropriately
+                Log.w("Status/V", "Google sign in failed", e)
+                // ...
+            }
+        }
+    }
 }
+
