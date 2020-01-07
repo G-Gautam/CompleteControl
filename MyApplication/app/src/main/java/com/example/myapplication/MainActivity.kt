@@ -7,8 +7,11 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.widget.Button
 import android.widget.TextView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : WearableActivity() {
 
@@ -16,6 +19,7 @@ class MainActivity : WearableActivity() {
     private lateinit var yReadingText: TextView
     private lateinit var zReadingText: TextView
     private lateinit var sensorStore: SensorStore
+    private lateinit var mAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +28,15 @@ class MainActivity : WearableActivity() {
         yReadingText = findViewById(R.id.yReadingText)
         zReadingText = findViewById(R.id.zReadingText)
         sensorStore = SensorStore(this, xReadingText, yReadingText, zReadingText)
+        mAuth = FirebaseAuth.getInstance()
 
+        var currentUser : FirebaseUser? = mAuth.currentUser
+        if(currentUser != null){
+            login()
+        }
+        else{
+            createUser()
+        }
         setAmbientEnabled()
     }
     
@@ -32,7 +44,6 @@ class MainActivity : WearableActivity() {
         .requestIdToken(getString(R.string.default_web_client_id))
         .requestEmail()
         .build()
-    
     
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -50,29 +61,6 @@ class MainActivity : WearableActivity() {
     private fun triggerFlick() : Boolean{
         sensorStore.wristFlickDetected()
         return false
-    }
-
-    private fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account!!)
-            } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
-                Log.w("Status/V", "Google sign in failed", e)
-                // ...
-            }
-        }
     }
 }
 
